@@ -1,1 +1,0 @@
-Information for shel tasks
