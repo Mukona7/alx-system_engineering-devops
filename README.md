@@ -1,1 +1,1 @@
-This respitory contains solutions to shell tasks
+Read Me
