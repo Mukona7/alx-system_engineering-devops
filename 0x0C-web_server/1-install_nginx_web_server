@@ -1,44 +1,12 @@
-Certainly! It seems there were issues with the previous script. Let's rewrite it to ensure it meets the task requirements and properly configures the Ubuntu machine to serve "Hello World!" from Nginx at its root URL. We'll also ensure it verifies that Nginx is installed, running, and returns the expected response.
-
-```bash
 #!/usr/bin/env bash
-
-# SSH connection details
-REMOTE_USER="your_remote_username"
-REMOTE_HOST="your_remote_hostname_or_ip"
-SSH_KEY_PATH="path_to_your_ssh_private_key"
-
-# Commands to be executed remotely
-REMOTE_COMMANDS=$(cat <<EOF
-sudo apt-get -y update
-sudo apt-get -y install nginx
-sudo ufw allow 'Nginx HTTP'
-echo 'Hello World!' | sudo tee /var/www/html/index.html > /dev/null
-sudo systemctl restart nginx
-EOF
-)
-
-# Execute commands remotely via SSH
-ssh -i "$SSH_KEY_PATH" "$REMOTE_USER@$REMOTE_HOST" "$REMOTE_COMMANDS"
-
-# Verify Nginx status and content
-NGINX_STATUS=$(ssh -i "$SSH_KEY_PATH" "$REMOTE_USER@$REMOTE_HOST" "curl -s -o /dev/null -w '%{http_code}' http://localhost/")
-HELLO_WORLD=$(ssh -i "$SSH_KEY_PATH" "$REMOTE_USER@$REMOTE_HOST" "curl -s http://localhost/")
-
-# Output verification results
-if [ "$NGINX_STATUS" -eq 200 ]; then
-    echo "Your server $REMOTE_HOST returns 200 when querying /"
-else
-    echo "Your server $REMOTE_HOST doesn't return 200 when querying /"
-fi
-
-if [[ "$HELLO_WORLD" == *"Hello World!"* ]]; then
-    echo "Nginx returns at its root / a page that contains Hello World!"
-else
-    echo "Nginx doesn't return a page that contains Hello World! at its root /"
-fi
-```
-
-Remember to replace `"your_remote_username"`, `"your_remote_hostname_or_ip"`, and `"path_to_your_ssh_private_key"` with the appropriate values for your remote server.
-
-This script will properly install and configure Nginx on the remote server, then verify that Nginx is running and returns "Hello World!" at its root URL.
+# a Bash script that installs nginx on our web-01 server
+# Nginx should be listening on port 80
+# When querying Nginx at its root / with a GET request
+# (requesting a page) using curl, it must return a page
+# that contains the string Holberton School
+apt-get -y update
+apt-get -y install nginx
+chown -R "$USER":"$USER" /var/www/html
+echo "Holberton School" > /var/www/html/index.nginx-debian.html
+ufw allow 'Nginx HTTP'
+service nginx start
